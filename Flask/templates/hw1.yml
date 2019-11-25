@@ -1,0 +1,30 @@
+---
+
+- name: Deploy Flask App Build
+  connection: ssh
+  gather_facts: false
+  hosts: all
+  vars:
+    repo_folder: /var/www/Flask/
+    live_folder: /var/www/Flask/
+    repo_name: MilFoy/hw1
+
+  tasks:
+    - git:
+        repo: https://github.com/MilFoy/hw1.git
+        dest: "{{ repo_folder }}"
+        update: yes
+
+    - name: Install dependencies
+        yarn:
+          path: "{{ repo_folder }}"
+
+    - name: Build project
+        command: yarn build
+        args:
+          chdir: "{{ repo_folder }}"
+
+    - name: Copy build to live directory
+        command: cp -TRv build {{ live_folder }}
+        args:
+          chdir: "{{ repo_folder }}"
